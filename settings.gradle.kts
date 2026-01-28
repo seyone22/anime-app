@@ -21,4 +21,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "Anime"
 include(":app")
- 
+include(":app:core")
+include(":core")
+include(":domain")
+include(":feature")
