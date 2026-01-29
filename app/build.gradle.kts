@@ -49,6 +49,9 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":domain"))
 
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.10.0") // For collectAsStateWithLifecycle
+
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
 

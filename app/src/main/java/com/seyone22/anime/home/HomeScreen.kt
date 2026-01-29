@@ -2,7 +2,18 @@ package com.seyone22.feature.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -10,8 +21,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.SuggestionChipDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -20,53 +41,86 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.seyone22.anime.AppViewModelProvider
 import com.seyone22.core.model.Anime
-import com.seyone22.core.model.sampleTrendingAnime
 
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
+    viewModel: HomeViewModel = viewModel(factory = AppViewModelProvider.Factory),
     onAnimeClick: (Int) -> Unit = {}
 ) {
-    // Surface handles the background color automatically based on the theme
+    // Collect state safely with lifecycle awareness
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     Surface(
-        modifier = modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
+        modifier = modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
     ) {
-        LazyColumn(
-            contentPadding = PaddingValues(bottom = 100.dp),
-            verticalArrangement = Arrangement.spacedBy(32.dp)
-        ) {
-            // 1. Header Title
-            item {
-                HomeHeader()
+        when (val state = uiState) {
+            is HomeUiState.Loading -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
             }
 
-            // 2. Hero Section (Featured)
-            item {
-                HeroSection(
-                    anime = sampleTrendingAnime.first(),
-                    onClick = onAnimeClick
-                )
+            is HomeUiState.Error -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(text = "Error: ${state.message}", color = MaterialTheme.colorScheme.error)
+                }
             }
 
-            // 3. Trending Carousel
-            item {
-                AnimeSection(
-                    title = "Trending Now",
-                    animeList = sampleTrendingAnime,
+            is HomeUiState.Success -> {
+                HomeContent(
+                    featuredAnime = state.featuredAnime,
+                    trendingAnime = state.trendingAnime,
+                    seasonalAnime = state.seasonalAnime,
                     onAnimeClick = onAnimeClick
                 )
             }
+        }
+    }
+}
 
-            // 4. Seasonal Carousel
+// Extracted Content Composable for cleaner code
+@Composable
+private fun HomeContent(
+    featuredAnime: Anime?,
+    trendingAnime: List<Anime>,
+    seasonalAnime: List<Anime>,
+    onAnimeClick: (Int) -> Unit
+) {
+    LazyColumn(
+        contentPadding = PaddingValues(bottom = 100.dp),
+        verticalArrangement = Arrangement.spacedBy(32.dp)
+    ) {
+        item { HomeHeader() }
+
+        // Hero Section
+        if (featuredAnime != null) {
+            item {
+                HeroSection(anime = featuredAnime, onClick = onAnimeClick)
+            }
+        }
+
+        // Trending
+        if (trendingAnime.isNotEmpty()) {
+            item {
+                AnimeSection(
+                    title = "Trending Now", animeList = trendingAnime, onAnimeClick = onAnimeClick
+                )
+            }
+        }
+
+        // Seasonal
+        if (seasonalAnime.isNotEmpty()) {
             item {
                 AnimeSection(
                     title = "Winter 2026 Season",
-                    animeList = sampleTrendingAnime.shuffled(),
+                    animeList = seasonalAnime,
                     onAnimeClick = onAnimeClick
                 )
             }
@@ -101,9 +155,9 @@ fun HeroSection(anime: Anime, onClick: (Int) -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .height(380.dp) // Immersive height
-            .padding(horizontal = 16.dp)
+        .padding(horizontal = 16.dp)
             .clip(RoundedCornerShape(32.dp)) // Material 3 Expressive Shape
-            .clickable { onClick(anime.id) }
+        .clickable { onClick(anime.id) }
             .background(MaterialTheme.colorScheme.surfaceVariant) // Placeholder color
     ) {
         // Image Placeholder (Replace with actual image URL in production)
@@ -180,9 +234,7 @@ fun HeroSection(anime: Anime, onClick: (Int) -> Unit) {
 
 @Composable
 fun AnimeSection(
-    title: String,
-    animeList: List<Anime>,
-    onAnimeClick: (Int) -> Unit
+    title: String, animeList: List<Anime>, onAnimeClick: (Int) -> Unit
 ) {
     Column {
         Text(
@@ -208,8 +260,7 @@ fun AnimePosterCard(anime: Anime, onClick: (Int) -> Unit) {
     Column(
         modifier = Modifier
             .width(150.dp)
-            .clickable { onClick(anime.id) }
-    ) {
+            .clickable { onClick(anime.id) }) {
         Card(
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier
@@ -236,13 +287,5 @@ fun AnimePosterCard(anime: Anime, onClick: (Int) -> Unit) {
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-    }
-}
-
-@Preview
-@Composable
-fun HomePreview() {
-    MaterialTheme {
-        HomeScreen()
     }
 }

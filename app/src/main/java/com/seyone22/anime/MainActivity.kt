@@ -60,7 +60,8 @@ fun AnimeApp() {
                 AppDestinations.HOME -> {
                     HomeScreen(
                         modifier = Modifier.padding(innerPadding),
-                        onAnimeClick = { /* Navigate to Details Phase 2 */ }
+                        // Use the Factory we just created
+                        onAnimeClick = { /* ... */ }
                     )
                 }
                 AppDestinations.FAVORITES -> {
