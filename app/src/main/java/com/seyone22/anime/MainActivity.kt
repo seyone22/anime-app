@@ -14,16 +14,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import com.seyone22.anime.ui.theme.AnimeTheme
+import com.seyone22.feature.home.HomeScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,12 +43,7 @@ fun AnimeApp() {
         navigationSuiteItems = {
             AppDestinations.entries.forEach {
                 item(
-                    icon = {
-                        Icon(
-                            it.icon,
-                            contentDescription = it.label
-                        )
-                    },
+                    icon = { Icon(it.icon, contentDescription = it.label) },
                     label = { Text(it.label) },
                     selected = it == currentDestination,
                     onClick = { currentDestination = it }
@@ -59,11 +51,27 @@ fun AnimeApp() {
             }
         }
     ) {
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            Greeting(
-                name = "Android",
-                modifier = Modifier.padding(innerPadding)
-            )
+        // Use the content padding provided by the navigation suite
+        Scaffold(
+            modifier = Modifier.fillMaxSize()
+        ) { innerPadding ->
+            // Switch content based on destination
+            when(currentDestination) {
+                AppDestinations.HOME -> {
+                    HomeScreen(
+                        modifier = Modifier.padding(innerPadding),
+                        onAnimeClick = { /* Navigate to Details Phase 2 */ }
+                    )
+                }
+                AppDestinations.FAVORITES -> {
+                    // Placeholder
+                    Greeting("Favorites", Modifier.padding(innerPadding))
+                }
+                AppDestinations.PROFILE -> {
+                    // Placeholder
+                    Greeting("Profile", Modifier.padding(innerPadding))
+                }
+            }
         }
     }
 }
@@ -83,12 +91,4 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
         text = "Hello $name!",
         modifier = modifier
     )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    AnimeTheme {
-        Greeting("Android")
-    }
 }
