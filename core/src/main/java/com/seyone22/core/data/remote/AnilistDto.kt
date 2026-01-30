@@ -57,3 +57,21 @@ data class GraphQLRequest(
     val query: String,
     val variables: Map<String, String> = emptyMap()
 )
+
+@Serializable
+data class AiringSchedulePageData(
+    val Page: AiringSchedulePageContent
+)
+
+@Serializable
+data class AiringSchedulePageContent(
+    val airingSchedule: List<AiringScheduleEntryDto>
+)
+
+@Serializable
+data class AiringScheduleEntryDto(
+    val id: Int,
+    val episode: Int,
+    val airingAt: Long,
+    val media: AnilistMediaDto // The actual anime data
+)

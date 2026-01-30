@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
 
     kotlin("plugin.serialization")
+    alias(libs.plugins.apollo)
 }
 
 android {
@@ -55,7 +56,25 @@ dependencies {
 
     // Serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.10.0")
-
+    implementation("com.apollographql.apollo:apollo-runtime:4.0.0")
     // Coroutines (for suspend functions)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+}
+
+apollo {
+    service("service") {
+        // This is the package where your GetAiringScheduleQuery, etc., will be generated
+        packageName.set("com.seyone22.core.data.remote")
+
+        // FIX: The path must be relative to the 'core' directory.
+        // Since the file is inside core/src/..., we start from "src/..."
+        schemaFile.set(file("src/main/java/com/seyone22/core/data/remote/schema.graphqls"))
+
+        // This block allows you to run :core:downloadApolloSchema easily from the IDE
+        introspection {
+            endpointUrl.set("https://graphql.anilist.co")
+            // Point the download output to the same location used above
+            schemaFile.set(file("src/main/java/com/seyone22/core/data/remote/schema.graphqls"))
+        }
+    }
 }

@@ -1,0 +1,15 @@
+fragment AnimeFields on Media {
+    id
+    title {
+        romaji
+        english
+    }
+    coverImage {
+        extraLarge
+        large
+    }
+    averageScore
+    description
+    season
+    seasonYear
+}

@@ -48,7 +48,7 @@ dependencies {
     implementation(project(":feature"))
     implementation(project(":core"))
     implementation(project(":domain"))
-
+    implementation(libs.calendar.multiplatform)
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.10.0") // For collectAsStateWithLifecycle
 

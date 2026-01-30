@@ -5,6 +5,8 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 /**
  * LIVE NETWORK TEST
@@ -79,5 +81,41 @@ class AnilistLiveTest {
         println("   Desc Snippet: ${anime.description.take(50)}...")
 
         assertTrue(anime.title.contains("Solo Leveling", ignoreCase = true))
+    }
+
+    @Test
+    fun `test fetch Airing Schedule for current week`() = runBlocking {
+        println("\n--- STARTING LIVE REQUEST: SCHEDULE ---")
+
+        // 1. Define a 7-day window starting from now
+        // AniList expects Unix timestamps (seconds)
+        val now = LocalDateTime.now()
+        val startTimestamp = now.toEpochSecond(ZoneOffset.UTC)
+        val endTimestamp = now.plusDays(7).toEpochSecond(ZoneOffset.UTC)
+
+        println("Fetching schedule from $now to ${now.plusDays(7)}")
+
+        val result = dataSource.getAiringSchedule(startTimestamp, endTimestamp)
+
+        // 2. Check for failure
+        if (result.isFailure) {
+            val error = result.exceptionOrNull()
+            println("❌ Schedule Request Failed: ${error?.message}")
+            throw error!!
+        }
+
+        // 3. Validate Data
+        val schedule = result.getOrNull()!!
+        println("✅ Success! Fetched ${schedule.size} airing entries for the week.")
+
+        assertTrue("Schedule should not be empty during active seasons", schedule.isNotEmpty())
+
+        // 4. Print samples for visual verification
+        // Ensure that our mapping to the domain 'Anime' model preserved essential discovery data
+        schedule.take(5).forEach { anime ->
+            println("   • ${anime.title}")
+            // Note: If you updated your Anime model to include airing info, print it here
+            println("     Cover: ${anime.coverUrl}")
+        }
     }
 }
