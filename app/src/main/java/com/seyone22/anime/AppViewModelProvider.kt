@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.seyone22.feature.details.DetailsViewModel
 import com.seyone22.feature.home.HomeViewModel
 
 object AppViewModelProvider {
@@ -14,8 +15,11 @@ object AppViewModelProvider {
                 repository = animeApplication().container.repository
             )
         }
-
-        // Add more initializers here for future ViewModels (e.g. DetailsViewModel)
+        initializer {
+            DetailsViewModel(
+                repository = animeApplication().container.repository
+            )
+        }
     }
 }
 

@@ -27,7 +27,9 @@ data class AnilistMediaDto(
     val description: String? = "",
     val bannerImage: String? = null,
     val status: String? = null,
-    val nextAiringEpisode: AnilistAiring? = null
+    val nextAiringEpisode: AnilistAiring? = null,
+    val season: String? = "",
+    val seasonYear: String? = ""
 )
 
 @Serializable

@@ -74,6 +74,8 @@ class AnilistDataSource : DataSource {
                     description
                     bannerImage
                     status
+                    season
+                    seasonYear
                 }
             }
         """.trimIndent()
@@ -128,7 +130,8 @@ class AnilistDataSource : DataSource {
             coverUrl = this.coverImage.extraLarge,
             rating = this.averageScore ?: 0,
             description = this.description ?: "No description available.",
-            season = "Unknown" // You can pass this in or map it from details
+            season = this.season ?: "",
+            seasonYear = this.seasonYear ?: ""
         )
     }
 }

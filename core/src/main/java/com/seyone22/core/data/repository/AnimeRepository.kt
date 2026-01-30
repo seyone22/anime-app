@@ -31,4 +31,8 @@ class AnimeRepository(
             Result.failure(trending.exceptionOrNull() ?: IOException("Unknown error"))
         }
     }
+
+    fun getAnimeDetails(id: Int): Flow<Result<Anime>> = flow {
+        emit(remoteDataSource.getAnimeDetails(id))
+    }
 }
